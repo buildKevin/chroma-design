@@ -1,7 +1,8 @@
 'use client'
 
-import { useState, useMemo, useEffect, useCallback } from 'react'
-import { Minus, Plus, Shuffle } from 'lucide-react'
+import { useState, useMemo, useEffect, useCallback, Suspense } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { Minus, Plus, Shuffle, Link, Check } from 'lucide-react'
 import { DesignHeader } from '@/components/design/header'
 import { ColorPicker } from '@/components/design/color-picker'
 import { PaletteDisplay } from '@/components/design/palette-display'
@@ -27,15 +28,46 @@ const NAMINGS = [
   { value: 'semantic',  label: 'Semantic' },
 ]
 
-export default function DesignPage() {
-  const [section, setSection]           = useState<'colors' | 'typography'>('colors')
-  const [baseColor, setBaseColor]       = useState('#6366f1')
-  const [algorithm, setAlgorithm]       = useState('tailwind')
-  const [namingPattern, setNaming]      = useState('tailwind')
-  const [contrastShift, setContrast]    = useState(0)
-  const [shadeCount, setShadeCount]     = useState(11)
-  const [fonts, setFonts]               = useState<FontConfig>({ heading: 'Inter', body: 'Inter' })
-  const [shuffling, setShuffling]       = useState(false)
+function DesignPage() {
+  const router       = useRouter()
+  const searchParams = useSearchParams()
+
+  // Read initial state from URL params (fallback to defaults)
+  const [section, setSection]        = useState<'colors' | 'typography'>('colors')
+  const [baseColor, setBaseColor]    = useState(() => {
+    const c = searchParams.get('color')
+    return c ? `#${c}` : '#6366f1'
+  })
+  const [algorithm, setAlgorithm]    = useState(() => searchParams.get('algo')    ?? 'tailwind')
+  const [namingPattern, setNaming]   = useState(() => searchParams.get('naming')  ?? 'tailwind')
+  const [contrastShift, setContrast] = useState(() => parseFloat(searchParams.get('contrast') ?? '0'))
+  const [shadeCount, setShadeCount]  = useState(() => parseInt(searchParams.get('shades')   ?? '11'))
+  const [fonts, setFonts]            = useState<FontConfig>(() => ({
+    heading: searchParams.get('fh') ?? 'Inter',
+    body:    searchParams.get('fb') ?? 'Inter',
+  }))
+  const [shuffling, setShuffling]    = useState(false)
+  const [copied, setCopied]          = useState(false)
+
+  // Sync state → URL (replaceState, no history entries)
+  useEffect(() => {
+    const p = new URLSearchParams({
+      color:    baseColor.replace('#', ''),
+      algo:     algorithm,
+      naming:   namingPattern,
+      contrast: contrastShift.toFixed(2),
+      shades:   String(shadeCount),
+      fh:       fonts.heading,
+      fb:       fonts.body,
+    })
+    router.replace(`/design?${p.toString()}`, { scroll: false })
+  }, [baseColor, algorithm, namingPattern, contrastShift, shadeCount, fonts, router])
+
+  const shareUrl = () => {
+    navigator.clipboard.writeText(window.location.href)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
 
   const shuffle = useCallback(() => {
     setShuffling(true)
@@ -97,14 +129,23 @@ export default function DesignPage() {
             </div>
           </div>
 
-          <button
-            onClick={shuffle}
-            className="flex items-center gap-2 rounded-md border border-border px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:border-foreground/30 hover:text-foreground"
-          >
-            <Shuffle className={cn('size-3.5', shuffling && 'animate-spin')} />
-            Shuffle
-            <kbd className="rounded border border-border bg-muted px-1.5 py-0.5 text-[10px]">Space</kbd>
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={shareUrl}
+              className="flex items-center gap-2 rounded-md border border-border px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:border-foreground/30 hover:text-foreground"
+            >
+              {copied ? <Check className="size-3.5" /> : <Link className="size-3.5" />}
+              {copied ? 'Copied!' : 'Share'}
+            </button>
+            <button
+              onClick={shuffle}
+              className="flex items-center gap-2 rounded-md border border-border px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:border-foreground/30 hover:text-foreground"
+            >
+              <Shuffle className={cn('size-3.5', shuffling && 'animate-spin')} />
+              Shuffle
+              <kbd className="rounded border border-border bg-muted px-1.5 py-0.5 text-[10px]">Space</kbd>
+            </button>
+          </div>
         </div>
 
         {/* ── Section tabs ─────────────────────────────────────── */}
@@ -264,5 +305,13 @@ export default function DesignPage() {
 
       </main>
     </div>
+  )
+}
+
+export default function DesignPageWrapper() {
+  return (
+    <Suspense>
+      <DesignPage />
+    </Suspense>
   )
 }
