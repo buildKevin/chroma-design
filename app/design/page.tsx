@@ -291,7 +291,7 @@ function DesignPage() {
         {/* ── Motion tab ───────────────────────────────────────── */}
         {section === 'motion' && (
           <div className="rounded-2xl border border-border p-6">
-            <MotionPicker />
+            <MotionPicker primaryColor={baseColor} />
           </div>
         )}
 
