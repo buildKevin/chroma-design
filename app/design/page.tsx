@@ -8,12 +8,14 @@ import { ColorPicker } from '@/components/design/color-picker'
 import { PaletteDisplay } from '@/components/design/palette-display'
 import { CodeOutput } from '@/components/design/code-output'
 import { TypographyPicker, type FontConfig } from '@/components/design/typography-picker'
+import { MotionPicker } from '@/components/design/motion-picker'
 import { generateTailwindPalette, getColorName, generateRandomColor } from '@/lib/color-utils'
 import { cn } from '@/lib/utils'
 
 const SECTIONS = [
   { id: 'colors',     label: 'Colors' },
   { id: 'typography', label: 'Typography' },
+  { id: 'motion',     label: 'Motion' },
 ] as const
 
 const ALGORITHMS = [
@@ -33,7 +35,7 @@ function DesignPage() {
   const searchParams = useSearchParams()
 
   // Read initial state from URL params (fallback to defaults)
-  const [section, setSection]        = useState<'colors' | 'typography'>('colors')
+  const [section, setSection]        = useState<'colors' | 'typography' | 'motion'>('colors')
   const [baseColor, setBaseColor]    = useState(() => {
     const c = searchParams.get('color')
     return c ? `#${c}` : '#6366f1'
@@ -283,6 +285,13 @@ function DesignPage() {
                 activeSection="colors"
               />
             </div>
+          </div>
+        )}
+
+        {/* ── Motion tab ───────────────────────────────────────── */}
+        {section === 'motion' && (
+          <div className="rounded-2xl border border-border p-6">
+            <MotionPicker />
           </div>
         )}
 
