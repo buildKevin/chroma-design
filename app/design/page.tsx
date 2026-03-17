@@ -1,0 +1,268 @@
+'use client'
+
+import { useState, useMemo, useEffect, useCallback } from 'react'
+import { Minus, Plus, Shuffle } from 'lucide-react'
+import { DesignHeader } from '@/components/design/header'
+import { ColorPicker } from '@/components/design/color-picker'
+import { PaletteDisplay } from '@/components/design/palette-display'
+import { CodeOutput } from '@/components/design/code-output'
+import { TypographyPicker, type FontConfig } from '@/components/design/typography-picker'
+import { generateTailwindPalette, getColorName, generateRandomColor } from '@/lib/color-utils'
+import { cn } from '@/lib/utils'
+
+const SECTIONS = [
+  { id: 'colors',     label: 'Colors' },
+  { id: 'typography', label: 'Typography' },
+] as const
+
+const ALGORITHMS = [
+  { value: 'tailwind',  label: 'Tailwind CSS' },
+  { value: 'material',  label: 'Material' },
+  { value: 'custom',    label: 'Custom' },
+]
+
+const NAMINGS = [
+  { value: 'tailwind',  label: '50 – 950' },
+  { value: 'numeric',   label: '100 – 1100' },
+  { value: 'semantic',  label: 'Semantic' },
+]
+
+export default function DesignPage() {
+  const [section, setSection]           = useState<'colors' | 'typography'>('colors')
+  const [baseColor, setBaseColor]       = useState('#6366f1')
+  const [algorithm, setAlgorithm]       = useState('tailwind')
+  const [namingPattern, setNaming]      = useState('tailwind')
+  const [contrastShift, setContrast]    = useState(0)
+  const [shadeCount, setShadeCount]     = useState(11)
+  const [fonts, setFonts]               = useState<FontConfig>({ heading: 'Inter', body: 'Inter' })
+  const [shuffling, setShuffling]       = useState(false)
+
+  const shuffle = useCallback(() => {
+    setShuffling(true)
+    setBaseColor(generateRandomColor())
+    setTimeout(() => setShuffling(false), 300)
+  }, [])
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.code === 'Space' && !['INPUT', 'TEXTAREA'].includes((e.target as HTMLElement)?.tagName)) {
+        e.preventDefault()
+        shuffle()
+      }
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [shuffle])
+
+  const palette = useMemo(
+    () => generateTailwindPalette(baseColor, shadeCount, contrastShift),
+    [baseColor, shadeCount, contrastShift]
+  )
+
+  const colorName = useMemo(() => {
+    const base = getColorName(baseColor)
+    const map: Record<string, string> = {
+      Pink: 'French Rose', Red: 'Crimson', Orange: 'Tangerine', Yellow: 'Gold',
+      Green: 'Emerald', Cyan: 'Teal', Blue: 'Sapphire', Magenta: 'Orchid',
+      Gray: 'Slate', White: 'Snow', Black: 'Obsidian',
+    }
+    return map[base] ?? base
+  }, [baseColor])
+
+  return (
+    <div className="min-h-screen bg-background text-foreground">
+      <DesignHeader />
+
+      <main className="mx-auto max-w-5xl px-6 pt-24 pb-24">
+
+        {/* ── Color identity row ───────────────────────────────── */}
+        <div className="mb-10 flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <div
+              className={cn(
+                'size-12 rounded-2xl shadow-md transition-all duration-300',
+                shuffling && 'scale-90'
+              )}
+              style={{
+                backgroundColor: baseColor,
+                boxShadow: `0 8px 24px ${baseColor}40`,
+              }}
+            />
+            <div>
+              <p className="text-xs font-medium uppercase tracking-widest text-muted-foreground">Base color</p>
+              <div className="flex items-baseline gap-2">
+                <h1 className="text-xl font-semibold tracking-tight">{colorName}</h1>
+                <span className="font-mono text-sm text-muted-foreground">{baseColor.toUpperCase()}</span>
+              </div>
+            </div>
+          </div>
+
+          <button
+            onClick={shuffle}
+            className="flex items-center gap-2 rounded-md border border-border px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:border-foreground/30 hover:text-foreground"
+          >
+            <Shuffle className={cn('size-3.5', shuffling && 'animate-spin')} />
+            Shuffle
+            <kbd className="rounded border border-border bg-muted px-1.5 py-0.5 text-[10px]">Space</kbd>
+          </button>
+        </div>
+
+        {/* ── Section tabs ─────────────────────────────────────── */}
+        <div className="mb-8 flex gap-0 border-b border-border">
+          {SECTIONS.map(({ id, label }) => (
+            <button
+              key={id}
+              onClick={() => setSection(id)}
+              className={cn(
+                'relative px-4 py-2.5 text-sm font-medium transition-colors',
+                section === id ? 'text-foreground' : 'text-muted-foreground hover:text-foreground'
+              )}
+            >
+              {label}
+              {section === id && (
+                <span className="absolute bottom-0 left-0 right-0 h-px bg-foreground" />
+              )}
+            </button>
+          ))}
+        </div>
+
+        {/* ── Colors tab ───────────────────────────────────────── */}
+        {section === 'colors' && (
+          <div className="space-y-4">
+
+            {/* Controls */}
+            <div className="grid gap-4 md:grid-cols-4">
+
+              {/* Color picker */}
+              <div className="rounded-2xl border border-border p-5">
+                <p className="mb-4 text-xs font-medium uppercase tracking-widest text-muted-foreground">Color</p>
+                <ColorPicker color={baseColor} onChange={setBaseColor} />
+              </div>
+
+              {/* Algorithm + Naming */}
+              <div className="rounded-2xl border border-border p-5">
+                <p className="mb-4 text-xs font-medium uppercase tracking-widest text-muted-foreground">Algorithm</p>
+                <div className="flex flex-col gap-1">
+                  {ALGORITHMS.map(({ value, label }) => (
+                    <button
+                      key={value}
+                      onClick={() => setAlgorithm(value)}
+                      className={cn(
+                        'rounded-lg px-3 py-2 text-left text-sm transition-colors',
+                        algorithm === value
+                          ? 'bg-foreground text-background'
+                          : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                      )}
+                    >
+                      {label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Naming */}
+              <div className="rounded-2xl border border-border p-5">
+                <p className="mb-4 text-xs font-medium uppercase tracking-widest text-muted-foreground">Naming</p>
+                <div className="flex flex-col gap-1">
+                  {NAMINGS.map(({ value, label }) => (
+                    <button
+                      key={value}
+                      onClick={() => setNaming(value)}
+                      className={cn(
+                        'rounded-lg px-3 py-2 text-left text-sm transition-colors',
+                        namingPattern === value
+                          ? 'bg-foreground text-background'
+                          : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                      )}
+                    >
+                      {label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Contrast + Shades */}
+              <div className="rounded-2xl border border-border p-5 flex flex-col gap-6">
+                {/* Contrast */}
+                <div>
+                  <p className="mb-3 text-xs font-medium uppercase tracking-widest text-muted-foreground">Contrast</p>
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="font-mono text-2xl font-light tabular-nums">{contrastShift.toFixed(2)}</span>
+                  </div>
+                  <input
+                    type="range"
+                    min={-1}
+                    max={1}
+                    step={0.01}
+                    value={contrastShift}
+                    onChange={(e) => setContrast(parseFloat(e.target.value))}
+                    className="w-full accent-foreground"
+                  />
+                </div>
+
+                {/* Shades */}
+                <div>
+                  <p className="mb-3 text-xs font-medium uppercase tracking-widest text-muted-foreground">Shades</p>
+                  <div className="flex items-center justify-between">
+                    <button
+                      onClick={() => setShadeCount(c => Math.max(3, c - 1))}
+                      disabled={shadeCount <= 3}
+                      className="flex size-8 items-center justify-center rounded-lg border border-border transition-colors hover:bg-muted disabled:opacity-30"
+                    >
+                      <Minus className="size-3" />
+                    </button>
+                    <span className="font-mono text-2xl font-light tabular-nums">{shadeCount}</span>
+                    <button
+                      onClick={() => setShadeCount(c => Math.min(15, c + 1))}
+                      disabled={shadeCount >= 15}
+                      className="flex size-8 items-center justify-center rounded-lg border border-border transition-colors hover:bg-muted disabled:opacity-30"
+                    >
+                      <Plus className="size-3" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Palette */}
+            <div className="rounded-2xl border border-border p-6">
+              <PaletteDisplay
+                colorName={colorName}
+                shades={palette}
+                baseShadeIndex={Math.floor(shadeCount / 2)}
+              />
+            </div>
+
+            {/* Code */}
+            <div className="rounded-2xl border border-border overflow-hidden">
+              <CodeOutput
+                colorName={colorName}
+                shades={palette}
+                fonts={fonts}
+                activeSection="colors"
+              />
+            </div>
+          </div>
+        )}
+
+        {/* ── Typography tab ───────────────────────────────────── */}
+        {section === 'typography' && (
+          <div className="space-y-4">
+            <div className="rounded-2xl border border-border p-6">
+              <TypographyPicker fonts={fonts} onChange={setFonts} primaryColor={baseColor} />
+            </div>
+            <div className="rounded-2xl border border-border overflow-hidden">
+              <CodeOutput
+                colorName={colorName}
+                shades={palette}
+                fonts={fonts}
+                activeSection="typography"
+              />
+            </div>
+          </div>
+        )}
+
+      </main>
+    </div>
+  )
+}
