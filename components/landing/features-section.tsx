@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import { Check, Copy } from 'lucide-react'
+import { Check, Copy, Figma, Search, Settings, Bell, User, Star, Heart } from 'lucide-react'
 
 /* ─────────────────────────────────────────────────────────
    1. PALETTE — bars grow one by one with a glow beam
@@ -508,15 +508,102 @@ function CopyIllustration() {
 }
 
 /* ─────────────────────────────────────────────────────────
+   6. ICONS — grid cycles highlight + copy/figma overlay
+───────────────────────────────────────────────────────── */
+const ICON_CELLS = [
+  { Icon: Search,   label: 'search'   },
+  { Icon: Settings, label: 'settings' },
+  { Icon: Bell,     label: 'bell'     },
+  { Icon: User,     label: 'user'     },
+  { Icon: Star,     label: 'star'     },
+  { Icon: Heart,    label: 'heart'    },
+]
+const ICON_COLORS = ['#6366f1', '#ec4899', '#10b981', '#f59e0b', '#3b82f6', '#8b5cf6']
+const ICON_LIBS   = ['Lucide', 'Heroicons', 'Phosphor', 'Tabler', 'Radix']
+
+function IconsIllustration() {
+  const [colorIdx, setColorIdx] = useState(0)
+  const [libIdx,   setLibIdx]   = useState(0)
+  const [activeCell, setActive] = useState<number | null>(null)
+  const [showBtns,  setShowBtns] = useState(false)
+
+  useEffect(() => {
+    let cancel = false
+    let cell = 0
+    const step = () => {
+      if (cancel) return
+      setActive(cell)
+      setShowBtns(false)
+      setTimeout(() => { if (!cancel) setShowBtns(true) }, 180)
+      setTimeout(() => {
+        if (cancel) return
+        setShowBtns(false)
+        setTimeout(() => {
+          if (cancel) return
+          cell = (cell + 1) % ICON_CELLS.length
+          if (cell === 0) {
+            setColorIdx(i => (i + 1) % ICON_COLORS.length)
+            setLibIdx(i   => (i + 1) % ICON_LIBS.length)
+          }
+          step()
+        }, 200)
+      }, 950)
+    }
+    step()
+    return () => { cancel = true }
+  }, [])
+
+  const color = ICON_COLORS[colorIdx]
+
+  return (
+    <div className="flex h-full flex-col gap-2.5 pt-2">
+      {/* Library badge */}
+      <div className="flex items-center gap-2 px-1">
+        <span className="rounded border border-border bg-background px-2 py-0.5 text-[9px] font-medium text-muted-foreground">
+          {ICON_LIBS[libIdx]}
+        </span>
+        <span className="text-[10px] text-muted-foreground">5 libraries · 400+ icons</span>
+      </div>
+
+      {/* 3×2 icon grid */}
+      <div className="grid grid-cols-3 gap-px overflow-hidden rounded-xl border border-border bg-border">
+        {ICON_CELLS.map(({ Icon: IconComp, label }, i) => {
+          const isActive = activeCell === i
+          return (
+            <div key={i} className="relative flex flex-col items-center justify-center gap-1 bg-background py-3">
+              <IconComp size={16} style={{ color }} />
+              <span className="text-[9px] text-muted-foreground">{label}</span>
+
+              {/* Hover overlay */}
+              <div
+                className="absolute inset-0 flex items-center justify-center gap-1.5 bg-background/95 transition-opacity duration-200"
+                style={{ opacity: isActive && showBtns ? 1 : 0 }}
+              >
+                <div className="flex h-6 w-6 items-center justify-center rounded-md border border-foreground/20 bg-background shadow-sm">
+                  <Copy size={9} className="text-foreground" />
+                </div>
+                <div className="flex h-6 w-6 items-center justify-center rounded-md border border-foreground/20 bg-background shadow-sm">
+                  <Figma size={9} className="text-foreground" />
+                </div>
+              </div>
+            </div>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
+
+/* ─────────────────────────────────────────────────────────
    Section wrapper
 ───────────────────────────────────────────────────────── */
 const FEATURES = [
-  { title: 'Smart palette generation', desc: 'Tailwind, Material, or custom algorithms. Perceptually balanced shades from any base color.',   Illustration: PaletteIllustration },
-  { title: 'Explore instantly',        desc: 'Hit spacebar for a random vibrant color. Adjust contrast shift and shade count on the fly.',      Illustration: ExploreIllustration },
-  { title: 'Typography system',        desc: 'Pair heading and body fonts from a curated Google Fonts selection with a live preview.',           Illustration: TypographyIllustration },
-  { title: 'Multi-format export',      desc: 'CSS custom properties, Tailwind v3/v4 config, or JSON design tokens — ready to paste.',           Illustration: CodeIllustration },
-  { title: 'Export to Figma',           desc: 'Copy your palette as an SVG, paste directly in Figma — color cards appear instantly on the canvas.', Illustration: FigmaIllustration },
-  { title: 'Copy in one click',        desc: 'Click any shade to copy its hex value. Export the full palette with a single button.',            Illustration: CopyIllustration },
+  { title: 'Smart palette generation', desc: 'Tailwind, Material, or custom algorithms. Perceptually balanced shades from any base color.',      Illustration: PaletteIllustration },
+  { title: 'Explore instantly',        desc: 'Hit spacebar for a random vibrant color. Adjust contrast shift and shade count on the fly.',         Illustration: ExploreIllustration },
+  { title: 'Typography system',        desc: 'Pair heading and body fonts from a curated Google Fonts selection with a live preview.',              Illustration: TypographyIllustration },
+  { title: 'Multi-format export',      desc: 'CSS custom properties, Tailwind v3/v4 config, or JSON design tokens — ready to paste.',              Illustration: CodeIllustration },
+  { title: 'Export to Figma',          desc: 'Copy your palette as an SVG, paste directly in Figma — color cards appear instantly on the canvas.', Illustration: FigmaIllustration },
+  { title: 'Icon libraries',           desc: 'Browse 400+ icons across Lucide, Heroicons, Phosphor, Tabler and Radix. Copy JSX or paste SVG straight into Figma.', Illustration: IconsIllustration },
 ]
 
 export function FeaturesSection() {
