@@ -218,6 +218,44 @@ ${colors}
 }`
 }
 
+// Generate an SVG of color swatches that can be pasted directly into Figma (Ctrl+V)
+export function generateFigmaSwatchSVG(colorName: string, shades: ColorShade[]): string {
+  const cardW = 88
+  const colorH = 88
+  const labelH = 40
+  const cardH = colorH + labelH
+  const gap = 6
+  const radius = 10
+  const n = shades.length
+  const totalW = n * cardW + (n - 1) * gap
+
+  const cards = shades
+    .map((shade, i) => {
+      const x = i * (cardW + gap)
+      // Pick label text color based on luminance
+      const { r, g, b } = shade.rgb
+      const lum = (0.299 * r + 0.587 * g + 0.114 * b) / 255
+      const onColor = lum > 0.5 ? '#111111' : '#ffffff'
+      return [
+        `<g transform="translate(${x},0)">`,
+        `  <rect width="${cardW}" height="${colorH}" rx="${radius}" fill="${shade.hex}"/>`,
+        // shade name inside the swatch, bottom-left
+        `  <text x="10" y="${colorH - 10}" font-family="-apple-system,BlinkMacSystemFont,'Inter',sans-serif" font-size="11" font-weight="700" fill="${onColor}" opacity="0.9">${shade.name}</text>`,
+        // hex value below the swatch
+        `  <text x="${cardW / 2}" y="${colorH + 16}" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,'Inter',sans-serif" font-size="10" font-weight="500" fill="#111111">${shade.hex.toUpperCase()}</text>`,
+        `  <text x="${cardW / 2}" y="${colorH + 30}" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,'Inter',sans-serif" font-size="9" fill="#888888">${colorName}</text>`,
+        `</g>`,
+      ].join('\n')
+    })
+    .join('\n')
+
+  return [
+    `<svg xmlns="http://www.w3.org/2000/svg" width="${totalW}" height="${cardH}" viewBox="0 0 ${totalW} ${cardH}">`,
+    cards,
+    `</svg>`,
+  ].join('\n')
+}
+
 // Generate design tokens output
 export function generateTokens(colorName: string, shades: ColorShade[]): string {
   const tokens = shades.reduce((acc, shade) => {

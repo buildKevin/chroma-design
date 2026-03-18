@@ -7,6 +7,7 @@ import {
   generateCSS,
   generateTailwindConfig,
   generateTokens,
+  generateFigmaSwatchSVG,
   type ColorShade,
 } from '@/lib/color-utils'
 import {
@@ -26,11 +27,13 @@ interface CodeOutputProps {
 type ColorFormat = 'HEX' | 'RGBA' | 'HSL' | 'OKLCH'
 
 const FORMAT_TABS = ['css', 'tailwind', 'tailwind4', 'tokens'] as const
+const FORMAT_TABS_COLORS = ['css', 'tailwind', 'tailwind4', 'tokens', 'figma'] as const
 const FORMAT_LABELS: Record<string, string> = {
   css: 'CSS',
   tailwind: 'Tailwind',
   tailwind4: 'Tailwind 4',
   tokens: 'Tokens',
+  figma: 'Figma',
 }
 
 export function CodeOutput({
@@ -58,6 +61,7 @@ export function CodeOutput({
       case 'tailwind': return generateTailwindConfig(colorName, shades)
       case 'tailwind4':return `/* Tailwind CSS v4 */\n@theme {\n${shades.map((s) => `  --color-${colorName.toLowerCase()}-${s.name}: ${s.hex};`).join('\n')}\n}`
       case 'tokens':   return generateTokens(colorName, shades)
+      case 'figma':    return generateFigmaSwatchSVG(colorName, shades)
       default:         return ''
     }
   }
@@ -73,7 +77,7 @@ export function CodeOutput({
       {/* Tab bar */}
       <div className="flex items-center justify-between border-b border-border">
         <div className="flex">
-          {FORMAT_TABS.map((tab) => (
+          {(activeSection === 'colors' ? FORMAT_TABS_COLORS : FORMAT_TABS).map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
@@ -119,10 +123,21 @@ export function CodeOutput({
         </div>
       </div>
 
-      {/* Code block */}
-      <pre className="max-h-60 overflow-auto rounded-b-2xl bg-muted/30 p-5 font-mono text-xs leading-6 text-foreground/80">
-        <code>{getCode()}</code>
-      </pre>
+      {/* Code block / Figma preview */}
+      {activeTab === 'figma' ? (
+        <div className="rounded-b-2xl bg-muted/30 p-6 space-y-3">
+          <div className="overflow-x-auto rounded-xl border border-border bg-white p-4">
+            <div dangerouslySetInnerHTML={{ __html: generateFigmaSwatchSVG(colorName, shades) }} />
+          </div>
+          <p className="text-[11px] text-muted-foreground">
+            Click <span className="font-medium text-foreground">Copy</span>, ouvre Figma, puis <kbd className="rounded border border-border bg-muted px-1.5 py-0.5 text-[10px]">Ctrl+V</kbd> — les swatches apparaissent directement sur le canvas.
+          </p>
+        </div>
+      ) : (
+        <pre className="max-h-60 overflow-auto rounded-b-2xl bg-muted/30 p-5 font-mono text-xs leading-6 text-foreground/80">
+          <code>{getCode()}</code>
+        </pre>
+      )}
     </div>
   )
 }
