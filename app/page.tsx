@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { ArrowRight, Code2, Github } from 'lucide-react'
 import { FeaturesSection } from '@/components/landing/features-section'
 import { ChangelogModal } from '@/components/design/changelog-modal'
+import { ThemeToggle } from '@/components/design/theme-toggle'
 
 const palette = [
   '#eef2ff', '#e0e7ff', '#c7d2fe', '#a5b4fc',
@@ -23,6 +24,7 @@ export default function HomePage() {
             <a href="#export" className="text-sm text-muted-foreground transition-colors hover:text-foreground">
               Export
             </a>
+            <ThemeToggle />
             <ChangelogModal />
             <a
               href="https://github.com/buildKevin/chroma-design"

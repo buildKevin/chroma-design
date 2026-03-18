@@ -13,7 +13,7 @@ import { cn } from '@/lib/utils'
 // ── Changelog data ────────────────────────────────────────────────────────────
 // Add new entries at the TOP. Latest version = CHANGELOG[0].
 
-const LATEST_VERSION = '0.4'
+const LATEST_VERSION = '0.5'
 
 type EntryType = 'New' | 'Improved' | 'Fixed'
 
@@ -24,6 +24,13 @@ interface Release {
 }
 
 const CHANGELOG: Release[] = [
+  {
+    version: '0.5',
+    date: 'March 2026',
+    entries: [
+      { type: 'New',      text: 'Dark mode — toggle light / dark theme from the navbar, preference saved automatically' },
+    ],
+  },
   {
     version: '0.4',
     date: 'March 2026',
