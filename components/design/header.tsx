@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { ArrowLeft, Github } from 'lucide-react'
+import { ChangelogModal } from '@/components/design/changelog-modal'
 
 export function DesignHeader() {
   return (
@@ -20,6 +21,7 @@ export function DesignHeader() {
         </div>
 
         <nav className="flex items-center gap-6">
+          <ChangelogModal />
           <a
             href="https://github.com/buildKevin/chroma-design"
             target="_blank"
