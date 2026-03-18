@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState, useCallback } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Check, Copy } from 'lucide-react'
 
 /* ─────────────────────────────────────────────────────────
@@ -322,88 +322,114 @@ function CodeIllustration() {
 }
 
 /* ─────────────────────────────────────────────────────────
-   5. CONTRAST — ratio counts up, AA/AAA badges light up
+   5. FIGMA — swatches paste onto a Figma-like canvas
 ───────────────────────────────────────────────────────── */
-const PAIRS = [
-  { bg: '#1e1b4b', fg: '#ffffff', ratio: 14.1 },
-  { bg: '#6366f1', fg: '#ffffff', ratio: 4.6  },
-  { bg: '#f5f3ff', fg: '#4338ca', ratio: 7.2  },
-  { bg: '#fde68a', fg: '#92400e', ratio: 5.8  },
+const FIGMA_PALETTES = [
+  ['#f5f3ff','#ddd6fe','#a78bfa','#7c3aed','#5b21b6','#4c1d95'],
+  ['#fff1f2','#fecdd3','#fb7185','#f43f5e','#be123c','#881337'],
+  ['#ecfdf5','#a7f3d0','#34d399','#059669','#065f46','#022c22'],
+  ['#fffbeb','#fde68a','#fcd34d','#d97706','#92400e','#451a03'],
 ]
 
-function ContrastIllustration() {
-  const [pi, setPi] = useState(0)
-  const [displayed, setDisplayed] = useState(0)
-  const [fading, setFading] = useState(false)
-  const rafRef = useRef<number>()
-
-  const animateUp = useCallback((target: number) => {
-    const start = performance.now()
-    const dur = 750
-    const tick = (now: number) => {
-      const t = Math.min((now - start) / dur, 1)
-      const eased = 1 - Math.pow(1 - t, 3)
-      setDisplayed(parseFloat((target * eased).toFixed(1)))
-      if (t < 1) rafRef.current = requestAnimationFrame(tick)
-    }
-    rafRef.current = requestAnimationFrame(tick)
-  }, [])
+function FigmaIllustration() {
+  const [pi, setPi]           = useState(0)
+  const [vis, setVis]         = useState<boolean[]>([])
+  const [pressing, setPressing] = useState(false)
+  const [pasting, setPasting] = useState(false)
 
   useEffect(() => {
-    animateUp(PAIRS[0].ratio)
-    const iv = setInterval(() => {
-      setFading(true)
-      setTimeout(() => {
-        setPi(i => {
-          const next = (i + 1) % PAIRS.length
-          animateUp(PAIRS[next].ratio)
-          return next
-        })
-        setFading(false)
-      }, 260)
-    }, 2800)
-    return () => { clearInterval(iv); if (rafRef.current) cancelAnimationFrame(rafRef.current) }
-  }, [animateUp])
+    let cancel = false
 
-  const pair = PAIRS[pi]
-  const aa = pair.ratio >= 4.5
-  const aaa = pair.ratio >= 7.0
+    const run = (idx: number) => {
+      if (cancel) return
+      setVis([])
+      setPasting(false)
+
+      // press Ctrl+V key
+      setTimeout(() => { if (!cancel) setPressing(true) }, 300)
+      setTimeout(() => { if (!cancel) { setPressing(false); setPasting(true) } }, 600)
+
+      // swatches pop in one by one
+      const palette = FIGMA_PALETTES[idx]
+      palette.forEach((_, i) => {
+        setTimeout(() => {
+          if (cancel) return
+          setVis(p => {
+            const n = [...p]
+            n[i] = true
+            return n
+          })
+        }, 700 + i * 160)
+      })
+
+      // pause then reset
+      setTimeout(() => {
+        if (cancel) return
+        setVis([])
+        setPasting(false)
+        setTimeout(() => {
+          if (cancel) return
+          const next = (idx + 1) % FIGMA_PALETTES.length
+          setPi(next)
+          run(next)
+        }, 400)
+      }, 700 + FIGMA_PALETTES[idx].length * 160 + 2000)
+    }
+
+    run(0)
+    return () => { cancel = true }
+  }, [])
+
+  const palette = FIGMA_PALETTES[pi]
 
   return (
-    <div
-      className="flex h-full items-center justify-center gap-5 transition-opacity duration-250"
-      style={{ opacity: fading ? 0 : 1 }}
-    >
+    <div className="flex h-full flex-col items-center justify-center gap-3">
+      {/* Mini Figma canvas */}
       <div
-        className="flex size-20 flex-col items-center justify-center gap-0.5 rounded-2xl transition-colors duration-500"
-        style={{ backgroundColor: pair.bg }}
+        className="relative flex items-end gap-1.5 rounded-xl px-4 pt-3 pb-4"
+        style={{ backgroundColor: '#1e1e1e', minWidth: 160 }}
       >
-        <span className="text-2xl font-bold leading-none transition-colors duration-500" style={{ color: pair.fg }}>Ag</span>
-        <span className="text-[10px] transition-colors duration-500" style={{ color: pair.fg, opacity: 0.75 }}>Sample</span>
-      </div>
-      <div>
-        <p className="font-mono text-2xl font-semibold tabular-nums leading-none">
-          {displayed.toFixed(1)}:1
-        </p>
-        <div className="mt-3 flex flex-col gap-1.5">
-          {[
-            { label: 'AA',  pass: aa },
-            { label: 'AAA', pass: aaa },
-          ].map(({ label, pass }) => (
-            <div key={label} className="flex items-center gap-2">
+        {/* Figma-like selection border when pasting */}
+        {pasting && (
+          <div
+            className="pointer-events-none absolute inset-1 rounded-lg transition-opacity duration-200"
+            style={{ border: '1px solid #0d99ff', opacity: vis.length > 0 ? 0 : 0.7 }}
+          />
+        )}
+        {palette.map((color, i) => {
+          const isVis = vis[i] === true
+          return (
+            <div
+              key={i}
+              className="flex flex-col items-center gap-1"
+              style={{
+                opacity: isVis ? 1 : 0,
+                transform: isVis ? 'scale(1) translateY(0)' : 'scale(0.6) translateY(6px)',
+                transition: 'opacity 0.2s ease, transform 0.2s ease',
+              }}
+            >
               <div
-                className="flex size-4 items-center justify-center rounded-full transition-all duration-400"
-                style={{ backgroundColor: pass ? '#10b981' : 'hsl(var(--muted))' }}
-              >
-                <Check
-                  className="size-2.5 transition-opacity duration-300"
-                  style={{ color: pass ? 'white' : 'transparent', opacity: pass ? 1 : 0 }}
-                />
-              </div>
-              <span className="text-[10px] font-medium text-muted-foreground">{label} {pass ? 'Pass' : 'Fail'}</span>
+                className="rounded-md"
+                style={{ width: 20, height: 28, backgroundColor: color }}
+              />
+              <div
+                className="rounded-sm"
+                style={{ width: 16, height: 3, backgroundColor: '#3a3a3a' }}
+              />
             </div>
-          ))}
-        </div>
+          )
+        })}
+      </div>
+
+      {/* Ctrl+V key */}
+      <div
+        className="flex select-none items-center gap-1 rounded-lg border border-border bg-background px-3 py-1.5 text-[10px] font-medium text-muted-foreground transition-all duration-150"
+        style={{
+          transform: pressing ? 'translateY(2px)' : 'translateY(0)',
+          boxShadow: pressing ? 'none' : '0 2px 0 0 hsl(var(--border))',
+        }}
+      >
+        <span className="opacity-60">⌘</span> V
       </div>
     </div>
   )
@@ -489,7 +515,7 @@ const FEATURES = [
   { title: 'Explore instantly',        desc: 'Hit spacebar for a random vibrant color. Adjust contrast shift and shade count on the fly.',      Illustration: ExploreIllustration },
   { title: 'Typography system',        desc: 'Pair heading and body fonts from a curated Google Fonts selection with a live preview.',           Illustration: TypographyIllustration },
   { title: 'Multi-format export',      desc: 'CSS custom properties, Tailwind v3/v4 config, or JSON design tokens — ready to paste.',           Illustration: CodeIllustration },
-  { title: 'Contrast-aware',           desc: 'Visual WCAG AA & AAA checks on every shade. Accessible palettes by default.',                     Illustration: ContrastIllustration },
+  { title: 'Export to Figma',           desc: 'Copy your palette as an SVG, paste directly in Figma — color cards appear instantly on the canvas.', Illustration: FigmaIllustration },
   { title: 'Copy in one click',        desc: 'Click any shade to copy its hex value. Export the full palette with a single button.',            Illustration: CopyIllustration },
 ]
 
