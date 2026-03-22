@@ -109,14 +109,14 @@ function DesignPage() {
     <div className="min-h-screen bg-background text-foreground">
       <DesignHeader />
 
-      <main className="mx-auto max-w-5xl px-6 pt-24 pb-24">
+      <main className="mx-auto max-w-5xl px-4 pt-20 pb-16 sm:px-6 sm:pt-24 sm:pb-24">
 
         {/* ── Color identity row ───────────────────────────────── */}
-        <div className="mb-10 flex items-center justify-between">
+        <div className="mb-6 flex flex-col gap-4 sm:mb-10 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-4">
             <div
               className={cn(
-                'size-12 rounded-2xl shadow-md transition-all duration-300',
+                'size-10 shrink-0 rounded-2xl shadow-md transition-all duration-300 sm:size-12',
                 shuffling && 'scale-90'
               )}
               style={{
@@ -124,11 +124,11 @@ function DesignPage() {
                 boxShadow: `0 8px 24px ${baseColor}40`,
               }}
             />
-            <div>
+            <div className="min-w-0">
               <p className="text-xs font-medium uppercase tracking-widest text-muted-foreground">Base color</p>
               <div className="flex items-baseline gap-2">
-                <h1 className="text-xl font-semibold tracking-tight">{colorName}</h1>
-                <span className="font-mono text-sm text-muted-foreground">{baseColor.toUpperCase()}</span>
+                <h1 className="truncate text-lg font-semibold tracking-tight sm:text-xl">{colorName}</h1>
+                <span className="shrink-0 font-mono text-sm text-muted-foreground">{baseColor.toUpperCase()}</span>
               </div>
             </div>
           </div>
@@ -136,24 +136,24 @@ function DesignPage() {
           <div className="flex items-center gap-2">
             <button
               onClick={shareUrl}
-              className="flex items-center gap-2 rounded-md border border-border px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:border-foreground/30 hover:text-foreground"
+              className="flex items-center gap-2 rounded-md border border-border px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:border-foreground/30 hover:text-foreground sm:px-4"
             >
               {copied ? <Check className="size-3.5" /> : <Link className="size-3.5" />}
-              {copied ? 'Copied!' : 'Share'}
+              <span className="hidden xs:inline">{copied ? 'Copied!' : 'Share'}</span>
             </button>
             <button
               onClick={shuffle}
-              className="flex items-center gap-2 rounded-md border border-border px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:border-foreground/30 hover:text-foreground"
+              className="flex items-center gap-2 rounded-md border border-border px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:border-foreground/30 hover:text-foreground sm:px-4"
             >
               <Shuffle className={cn('size-3.5', shuffling && 'animate-spin')} />
               Shuffle
-              <kbd className="rounded border border-border bg-muted px-1.5 py-0.5 text-[10px]">Space</kbd>
+              <kbd className="hidden rounded border border-border bg-muted px-1.5 py-0.5 text-[10px] sm:inline">Space</kbd>
             </button>
           </div>
         </div>
 
         {/* ── Section tabs ─────────────────────────────────────── */}
-        <div className="mb-8 flex gap-0 border-b border-border">
+        <div className="-mx-4 mb-6 flex gap-0 overflow-x-auto border-b border-border px-4 sm:mx-0 sm:mb-8 sm:px-0">
           {SECTIONS.map(({ id, label }) => (
             <button
               key={id}
@@ -173,10 +173,10 @@ function DesignPage() {
 
         {/* ── Colors tab ───────────────────────────────────────── */}
         {section === 'colors' && (
-          <div className="space-y-4">
+          <div className="space-y-3 sm:space-y-4">
 
             {/* Controls */}
-            <div className="grid gap-4 md:grid-cols-4">
+            <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 sm:gap-4 md:grid-cols-4">
 
               {/* Color picker */}
               <div className="rounded-2xl border border-border p-5">
@@ -270,7 +270,7 @@ function DesignPage() {
             </div>
 
             {/* Palette */}
-            <div className="rounded-2xl border border-border p-6">
+            <div className="rounded-2xl border border-border p-4 sm:p-6">
               <PaletteDisplay
                 colorName={colorName}
                 shades={palette}
@@ -292,14 +292,14 @@ function DesignPage() {
 
         {/* ── Motion tab ───────────────────────────────────────── */}
         {section === 'motion' && (
-          <div className="rounded-2xl border border-border p-6">
+          <div className="rounded-2xl border border-border p-4 sm:p-6">
             <MotionPicker primaryColor={baseColor} />
           </div>
         )}
 
         {/* ── Icons tab ────────────────────────────────────────── */}
         {section === 'icons' && (
-          <div className="rounded-2xl border border-border p-6">
+          <div className="rounded-2xl border border-border p-4 sm:p-6">
             <IconPicker primaryColor={baseColor} />
           </div>
         )}
@@ -307,7 +307,7 @@ function DesignPage() {
         {/* ── Typography tab ───────────────────────────────────── */}
         {section === 'typography' && (
           <div className="space-y-4">
-            <div className="rounded-2xl border border-border p-6">
+            <div className="rounded-2xl border border-border p-4 sm:p-6">
               <TypographyPicker fonts={fonts} onChange={setFonts} primaryColor={baseColor} />
             </div>
             <div className="rounded-2xl border border-border overflow-hidden">

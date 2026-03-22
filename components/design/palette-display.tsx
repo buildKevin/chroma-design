@@ -60,7 +60,7 @@ export function PaletteDisplay({ colorName, shades, baseShadeIndex = 4 }: Palett
       </div>
 
       {/* Grid */}
-      <div className="grid grid-cols-4 gap-2 sm:grid-cols-6 lg:grid-cols-11">
+      <div className="grid grid-cols-3 gap-1.5 sm:grid-cols-6 sm:gap-2 lg:grid-cols-11">
         {shades.map((shade, i) => (
           <button
             key={shade.name}

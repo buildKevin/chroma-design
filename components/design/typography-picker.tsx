@@ -181,7 +181,7 @@ export function TypographyPicker({
         {/* Header Preview */}
         <div
           className={cn(
-            'border-b px-6 py-4',
+            'border-b px-4 py-4 sm:px-6',
             previewMode === 'dark'
               ? 'border-neutral-800'
               : 'border-neutral-100'
@@ -217,10 +217,10 @@ export function TypographyPicker({
         </div>
 
         {/* Content Preview */}
-        <div className="p-6">
+        <div className="p-4 sm:p-6">
           <h1
             className={cn(
-              'mb-3 text-3xl font-bold tracking-tight',
+              'mb-3 text-2xl font-bold tracking-tight sm:text-3xl',
               previewMode === 'dark' ? 'text-white' : 'text-neutral-900'
             )}
             style={{ fontFamily: getFontFamily(fonts.heading) }}
@@ -264,22 +264,22 @@ export function TypographyPicker({
         {/* Type Scale Preview */}
         <div
           className={cn(
-            'border-t px-6 py-4',
+            'border-t px-4 py-4 sm:px-6',
             previewMode === 'dark' ? 'border-neutral-800' : 'border-neutral-100'
           )}
         >
           <div className="space-y-2">
             {[
-              { label: 'Display', size: 'text-4xl', weight: 'font-bold' },
-              { label: 'H1', size: 'text-2xl', weight: 'font-semibold' },
-              { label: 'H2', size: 'text-xl', weight: 'font-semibold' },
+              { label: 'Display', size: 'text-2xl sm:text-4xl', weight: 'font-bold' },
+              { label: 'H1', size: 'text-xl sm:text-2xl', weight: 'font-semibold' },
+              { label: 'H2', size: 'text-lg sm:text-xl', weight: 'font-semibold' },
               { label: 'Body', size: 'text-base', weight: 'font-normal' },
               { label: 'Small', size: 'text-sm', weight: 'font-normal' },
             ].map((item) => (
-              <div key={item.label} className="flex items-baseline gap-4">
+              <div key={item.label} className="flex items-baseline gap-2 sm:gap-4">
                 <span
                   className={cn(
-                    'w-16 text-xs uppercase tracking-wide',
+                    'w-12 shrink-0 text-[10px] uppercase tracking-wide sm:w-16 sm:text-xs',
                     previewMode === 'dark'
                       ? 'text-neutral-500'
                       : 'text-neutral-400'

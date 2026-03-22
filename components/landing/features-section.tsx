@@ -620,13 +620,13 @@ export function FeaturesSection() {
   }, [])
 
   return (
-    <section id="features" className="mx-auto max-w-5xl px-6 py-32">
+    <section id="features" className="mx-auto max-w-5xl px-4 py-16 sm:px-6 sm:py-32">
       <div className="mb-16">
         <p className="mb-3 text-xs font-medium uppercase tracking-widest text-muted-foreground">Features</p>
         <h2 className="text-3xl font-semibold tracking-tight">Everything you need</h2>
       </div>
 
-      <div ref={ref} className="grid gap-4 md:grid-cols-3">
+      <div ref={ref} className="grid gap-3 sm:gap-4 md:grid-cols-3">
         {FEATURES.map(({ title, desc, Illustration }, i) => (
           <div
             key={title}

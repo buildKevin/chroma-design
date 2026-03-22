@@ -8,20 +8,20 @@ import { ThemeToggle } from '@/components/design/theme-toggle'
 export function DesignHeader() {
   return (
     <header className="fixed top-0 z-50 w-full bg-background/80 backdrop-blur-md">
-      <div className="mx-auto flex h-14 max-w-5xl items-center justify-between px-6">
-        <div className="flex items-center gap-6">
+      <div className="mx-auto flex h-14 max-w-5xl items-center justify-between px-4 sm:px-6">
+        <div className="flex items-center gap-3 sm:gap-6">
           <Link
             href="/"
             className="flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
           >
             <ArrowLeft className="size-3.5" />
-            Back
+            <span className="hidden sm:inline">Back</span>
           </Link>
           <span className="h-4 w-px bg-border" />
           <span className="text-sm font-semibold tracking-tight">Chroma</span>
         </div>
 
-        <nav className="flex items-center gap-6">
+        <nav className="flex items-center gap-3 sm:gap-6">
           <ThemeToggle />
           <ChangelogModal />
           <a
@@ -31,7 +31,7 @@ export function DesignHeader() {
             className="flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
           >
             <Github className="size-3.5" />
-            GitHub
+            <span className="hidden sm:inline">GitHub</span>
           </a>
         </nav>
       </div>

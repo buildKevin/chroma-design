@@ -178,7 +178,7 @@ export function MotionPicker({ primaryColor = '#6366f1' }: MotionPickerProps) {
     <div className="space-y-5">
 
       {/* ── Top row: canvas + right panel ───────────────────────── */}
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className="grid gap-3 sm:gap-4 md:grid-cols-2">
 
         {/* 2D Canvas */}
         <div className="relative overflow-hidden rounded-2xl border border-border bg-muted/20">

@@ -3,6 +3,7 @@ import { ArrowRight, Code2, Github } from 'lucide-react'
 import { FeaturesSection } from '@/components/landing/features-section'
 import { ChangelogModal } from '@/components/design/changelog-modal'
 import { ThemeToggle } from '@/components/design/theme-toggle'
+import { LandingMobileMenu } from '@/components/landing/mobile-menu'
 
 const palette = [
   '#eef2ff', '#e0e7ff', '#c7d2fe', '#a5b4fc',
@@ -15,9 +16,11 @@ export default function HomePage() {
     <div className="min-h-screen bg-background text-foreground">
       {/* Nav */}
       <header className="fixed top-0 z-50 w-full bg-background/80 backdrop-blur-md">
-        <div className="mx-auto flex h-14 max-w-5xl items-center justify-between px-6">
+        <div className="mx-auto flex h-14 max-w-5xl items-center justify-between px-4 sm:px-6">
           <span className="text-sm font-semibold tracking-tight">Chroma</span>
-          <nav className="flex items-center gap-6">
+
+          {/* Desktop nav */}
+          <nav className="hidden items-center gap-6 md:flex">
             <a href="#features" className="text-sm text-muted-foreground transition-colors hover:text-foreground">
               Features
             </a>
@@ -42,19 +45,25 @@ export default function HomePage() {
               Open app
             </Link>
           </nav>
+
+          {/* Mobile nav */}
+          <div className="flex items-center gap-3 md:hidden">
+            <ThemeToggle />
+            <LandingMobileMenu />
+          </div>
         </div>
       </header>
 
       <main>
         {/* Hero */}
-        <section className="mx-auto max-w-5xl px-6 pb-16 pt-36">
-          <div className="flex flex-col items-start gap-8">
+        <section className="mx-auto max-w-5xl px-4 pb-16 pt-28 sm:px-6 sm:pt-36">
+          <div className="flex flex-col items-start gap-6 sm:gap-8">
             <div className="inline-flex items-center gap-2 rounded-full border border-border px-3 py-1 text-xs text-muted-foreground">
               <span className="size-1.5 rounded-full bg-foreground/30" />
               Design systems, simplified
             </div>
 
-            <h1 className="max-w-2xl text-5xl font-semibold leading-[1.1] tracking-tight md:text-6xl">
+            <h1 className="max-w-2xl text-3xl font-semibold leading-[1.1] tracking-tight sm:text-5xl md:text-6xl">
               Generate color palettes
               <br />
               <span className="text-muted-foreground">ready to ship.</span>
@@ -78,7 +87,7 @@ export default function HomePage() {
           </div>
 
           {/* App preview mockup */}
-          <div className="mt-20 overflow-hidden rounded-2xl border border-border shadow-sm">
+          <div className="mt-12 overflow-hidden rounded-2xl border border-border shadow-sm sm:mt-20">
             {/* Window chrome */}
             <div className="flex items-center gap-1.5 border-b border-border bg-muted/40 px-4 py-3">
               <span className="size-2.5 rounded-full bg-foreground/10" />
@@ -91,7 +100,7 @@ export default function HomePage() {
 
             <div className="grid grid-cols-1 gap-0 md:grid-cols-[280px_1fr]">
               {/* Left sidebar */}
-              <div className="border-r border-border p-6">
+              <div className="hidden border-r border-border p-6 md:block">
                 <p className="mb-4 text-xs font-medium uppercase tracking-widest text-muted-foreground">
                   Base color
                 </p>
@@ -131,7 +140,7 @@ export default function HomePage() {
                     />
                   ))}
                 </div>
-                <div className="mt-3 flex gap-1">
+                <div className="mt-3 hidden gap-1 sm:flex">
                   {['50', '100', '200', '300', '400', '500', '600', '700', '800', '900', '950'].map((shade, i) => (
                     <div key={shade} className="flex-1 text-center font-mono text-[10px] text-muted-foreground">
                       {shade}
@@ -147,7 +156,7 @@ export default function HomePage() {
         <FeaturesSection />
 
         {/* Export formats */}
-        <section id="export" className="mx-auto max-w-5xl px-6 py-32">
+        <section id="export" className="mx-auto max-w-5xl px-4 py-16 sm:px-6 sm:py-32">
           <div className="grid items-start gap-16 md:grid-cols-2">
             <div>
               <p className="mb-3 text-xs font-medium uppercase tracking-widest text-muted-foreground">
@@ -191,8 +200,8 @@ export default function HomePage() {
         </section>
 
         {/* CTA */}
-        <section className="mx-auto max-w-5xl px-6 pb-32">
-          <div className="rounded-2xl border border-border p-16 text-center">
+        <section className="mx-auto max-w-5xl px-4 pb-16 sm:px-6 sm:pb-32">
+          <div className="rounded-2xl border border-border p-8 text-center sm:p-16">
             <h2 className="mb-4 text-3xl font-semibold tracking-tight">
               Start building your palette
             </h2>
@@ -212,7 +221,7 @@ export default function HomePage() {
 
       {/* Footer */}
       <footer className="py-8">
-        <div className="mx-auto flex max-w-5xl items-center justify-between px-6">
+        <div className="mx-auto flex max-w-5xl items-center justify-between px-4 sm:px-6">
           <span className="text-sm font-semibold">Chroma</span>
           <p className="text-xs text-muted-foreground">Design system generator</p>
         </div>

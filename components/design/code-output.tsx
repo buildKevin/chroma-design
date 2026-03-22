@@ -75,14 +75,14 @@ export function CodeOutput({
   return (
     <div className="space-y-0">
       {/* Tab bar */}
-      <div className="flex items-center justify-between border-b border-border">
-        <div className="flex">
+      <div className="flex flex-col gap-0 border-b border-border sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex overflow-x-auto">
           {(activeSection === 'colors' ? FORMAT_TABS_COLORS : FORMAT_TABS).map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
               className={cn(
-                'relative px-4 py-2.5 text-xs font-medium transition-colors',
+                'relative shrink-0 px-3 py-2.5 text-xs font-medium transition-colors sm:px-4',
                 activeTab === tab ? 'text-foreground' : 'text-muted-foreground hover:text-foreground'
               )}
             >
@@ -94,7 +94,7 @@ export function CodeOutput({
           ))}
         </div>
 
-        <div className="flex items-center gap-2 pr-1">
+        <div className="flex items-center gap-2 border-t border-border px-2 py-1.5 sm:border-t-0 sm:pr-1">
           {activeSection === 'colors' && (
             <div className="flex gap-0.5">
               {(['HEX', 'RGBA', 'HSL', 'OKLCH'] as const).map((fmt) => (
@@ -115,7 +115,7 @@ export function CodeOutput({
           )}
           <button
             onClick={copyCode}
-            className="flex items-center gap-1.5 rounded-md border border-border px-3 py-1.5 text-xs font-medium transition-colors hover:bg-muted"
+            className="ml-auto flex items-center gap-1.5 rounded-md border border-border px-3 py-1.5 text-xs font-medium transition-colors hover:bg-muted"
           >
             {copied ? <Check className="size-3" /> : <Copy className="size-3" />}
             {copied ? 'Copied!' : 'Copy'}

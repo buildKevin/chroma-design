@@ -560,7 +560,7 @@ export function IconPicker({ primaryColor }: IconPickerProps) {
       </div>
 
       {/* ── Search + Size ─────────────────────────────────── */}
-      <div className="flex items-center gap-3">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground" />
           <input
@@ -638,7 +638,7 @@ export function IconPicker({ primaryColor }: IconPickerProps) {
               <p className="text-sm">No icons found for "{search}"</p>
             </div>
           ) : (
-            <div className="grid grid-cols-[repeat(auto-fill,minmax(80px,1fr))] gap-px bg-border p-px">
+            <div className="grid grid-cols-[repeat(auto-fill,minmax(70px,1fr))] gap-px bg-border p-px sm:grid-cols-[repeat(auto-fill,minmax(80px,1fr))]">
               {filtered.map(entry => {
                 const isCopied      = copiedId      === entry.id
                 const isFigmaCopied = figmaCopiedId === entry.id
