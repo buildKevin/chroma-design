@@ -224,6 +224,14 @@ export default function HomePage() {
         <div className="mx-auto flex max-w-5xl items-center justify-between px-4 sm:px-6">
           <span className="text-sm font-semibold">Chroma</span>
           <p className="text-xs text-muted-foreground">Design system generator</p>
+          <a
+            href="https://buymeacoffee.com/buildkevin"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-xs text-muted-foreground/50 transition-colors hover:text-muted-foreground"
+          >
+            ☕ Buy me a coffee
+          </a>
         </div>
       </footer>
     </div>
